@@ -1,33 +1,34 @@
+import bcrypt
 import mysql.connector
-import numpy as np
-import pandas as pd 
+ 
 def login(userid, password):
     conn = mysql.connector.connect(
         host="localhost",
         user="root", 
         password="",
-
     )
     cursor = conn.cursor()
     cursor.execute("CREATE DATABASE IF NOT EXISTS USER_DETAILS")
     cursor.execute("USE USER_DETAILS")
-    cursor.execute("""CREATE TABLE IF NOT EXISTS users (user_id INT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255))""")
-    cursor.execute("SELECT * FROM users WHERE user_id = %s AND password = %s", (userid, password))
-    result = cursor.fetchone()  
-
-    if result is not None:
-        print("Login successful!")
-        cursor.close()
-        conn.close()
-        return True
-    else:
-        print("Invalid userid or password. Please try again.")
-        cursor.close()
-        conn.close()
-        return False
+    cursor.execute("""CREATE TABLE IF NOT EXISTS users (user_id INT PRIMARY KEY, username VARCHAR(255), password VARCHAR(60), balance FLOAT)""")
+    cursor.execute("SELECT password FROM users WHERE user_id = %s", (userid,))
+    result = cursor.fetchone()
+    if result:
+        stored = result[0]
+        if isinstance(stored, str):
+            stored = stored.encode()
+        if bcrypt.checkpw(password.encode(), stored):
+            print("Login successful!")
+            conn.close()
+            cursor.close()
+            return True
+    print("Invalid userid or password.")
+    conn.close()
+    cursor.close()
+    return False
+        
 
 def sign_up(name, password):
-    userid = np.random.randint(1000, 9999) 
     conn = mysql.connector.connect(
         host="localhost",
         user="root",
@@ -36,24 +37,19 @@ def sign_up(name, password):
     cursor = conn.cursor()
     cursor.execute("CREATE DATABASE IF NOT EXISTS USER_DETAILS")
     cursor.execute("USE USER_DETAILS")  
-    cursor.execute("""CREATE TABLE IF NOT EXISTS users (user_id INT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255))""")
-    cursor.execute("select * from users where user_id = %s", (userid,))
-    result = cursor.fetchone()
-    if result is not None:
-        print("User ID already exists. Please try again.")
-        cursor.close()
-        conn.close()
-        return False
-    else:
-        cursor.execute("INSERT INTO users (user_id, username, password) VALUES (%s, %s, %s)", (userid, name, password))
-        conn.commit()
-        print("Sign-up successful! Your user ID is:", userid)
-        cursor.close()
-        conn.close()
-        return True
+    cursor.execute("""CREATE TABLE IF NOT EXISTS users (user_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(60),balance FLOAT )""")
+    hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+    cursor.execute("INSERT INTO users (username, password, balance) VALUES (%s, %s, %s)", (name, hashed, 100000.0))
+    conn.commit()
+    userid = cursor.lastrowid
+    print("Sign-up successful! Your user ID is:", userid)
+    cursor.close()
+    conn.close()
+    return userid
 
 print("Welcome to Unibril's Finance Tracker!")
 logged_in = False
+userid = None
 while not logged_in:
     intial = input("Login or SignUp")
     if intial.lower() =="login":
@@ -77,12 +73,13 @@ while not logged_in:
         print("Enter your name and password to sign up.")
         name = input("Name: ")
         password = input("Password: ")
-        success = sign_up(name, password)
-        if success:
+        userid = sign_up(name, password)
+        if userid:
             print("You can now log in with your new credentials.")
     else:
         print("Invalid option. Please enter 'Login' or 'SignUp'.")
 if logged_in:
+    current_user_id = userid
     conn = mysql.connector.connect(
         host="localhost",
         user="root",            
@@ -100,6 +97,15 @@ if logged_in:
         quantity INT, 
         FOREIGN KEY (user_id) REFERENCES users(user_id)
     )""")
+    cursor.execute("""CREATE TABLE IF NOT EXISTS transaction_history (
+                   transaction_id INT PRIMARY KEY AUTO_INCREMENT,
+                   user_id INT, ticker VARCHAR(10), 
+                   buy_price FLOAT, 
+                   sell_price FLOAT, 
+                   quantity INT,
+                   FOREIGN KEY (user_id) REFERENCES users(user_id))"""
+                   )
+    conn.commit()
     cursor.close()
     conn.close()
 
