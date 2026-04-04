@@ -113,7 +113,7 @@ if logged_in:
     conn.close()
 
     print("You are now logged in. You can view your statement, buy stocks, or sell stocks.")
-    initial = input("Enter 'Statement' to view your statement, 'Buy' to buy stocks, or 'Sell' to sell stocks: ")
+    initial = input("Enter 'Statement' to view your statement, 'Buy' to buy stocks, or 'Sell' to sell stocks or 'Add' to add funds: ")
     if initial.lower() == "statement":
         from statement import view_statement
         view_statement(current_user_id)
@@ -123,6 +123,10 @@ if logged_in:
     elif initial.lower() == "sell":
         from sell_stocks import sell_stonks
         sell_stonks(current_user_id)
+    elif initial.lower() == "add":
+        from statement import add_funds
+        amount = float(input("Enter the amount you want to add: "))
+        add_funds(current_user_id, amount)
     else:
         print("Invalid option. Please enter 'Statement', 'Buy', or 'Sell'.")
 
