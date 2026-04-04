@@ -6,7 +6,7 @@ def sell_stonks(user_id):
         user="root",    
         password=""
     )
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
     try:  
         cursor.execute("USE USER_DETAILS")
         stock = input("Enter the stock ticker you want to sell: ")
@@ -39,6 +39,7 @@ def sell_stonks(user_id):
                     return                
                 if number_of_stocks > quantity:
                     print("You cannot sell more stocks than you own.")
+                    return
                 else:
                     balance += simulated_selling_price * number_of_stocks
                     cursor.execute("UPDATE users SET balance = %s WHERE user_id = %s", (balance, user_id))
@@ -54,7 +55,11 @@ def sell_stonks(user_id):
                         print(f"You have sold {number_of_stocks} shares of {stock}. Remaining shares: {quantity - number_of_stocks}")
                         cursor.execute("INSERT INTO transaction_history (user_id, ticker, buy_price, sell_price, quantity) VALUES (%s, %s, %s, %s, %s)", (user_id, stock, buy_price, simulated_selling_price, number_of_stocks))
                         print("Transaction recorded in history.")
-                conn.commit()        
+                conn.commit()     
+                sure = input("Do you want profit or loss?")
+                if sure.lower() == "yes":
+                    from profit_loss_calcu import profit_or_loss
+                    profit_or_loss(buy_price, simulated_selling_price, number_of_stocks, stock, user_id)   
         else:    
             print(f"Stock {stock} not found in your portfolio.")
     finally:        
