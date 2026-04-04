@@ -1,7 +1,7 @@
 import mysql.connector
 import yfinance as yf
 
-def buy_stocks(current_user_id):
+def buy_stonks(current_user_id):
     conn = mysql.connector.connect(
         host="localhost",
         user="root",

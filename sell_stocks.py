@@ -1,6 +1,6 @@
 import mysql.connector
 import yfinance as yf
-def sell_stocks(user_id):
+def sell_stonks(user_id):
     conn = mysql.connector.connect(
         host="localhost",
         user="root",    

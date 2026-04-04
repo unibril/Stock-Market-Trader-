@@ -1,5 +1,9 @@
 import bcrypt
 import mysql.connector
+import yfinance as yf
+import sell_stocks
+import buy_stocks
+import statement
  
 def login(userid, password):
     conn = mysql.connector.connect(
@@ -51,7 +55,7 @@ print("Welcome to Unibril's Finance Tracker!")
 logged_in = False
 userid = None
 while not logged_in:
-    intial = input("Login or SignUp")
+    intial = input("Login or SignUp ")
     if intial.lower() =="login":
         print("Enter your userid and password to log in.")
         while True: 
@@ -107,6 +111,20 @@ if logged_in:
     conn.commit()
     cursor.close()
     conn.close()
+
+    print("You are now logged in. You can view your statement, buy stocks, or sell stocks.")
+    initial = input("Enter 'Statement' to view your statement, 'Buy' to buy stocks, or 'Sell' to sell stocks: ")
+    if initial.lower() == "statement":
+        from statement import view_statement
+        view_statement(current_user_id)
+    elif initial.lower() == "buy":
+        from buy_stocks import buy_stonks
+        buy_stonks(current_user_id)
+    elif initial.lower() == "sell":
+        from sell_stocks import sell_stonks
+        sell_stonks(current_user_id)
+    else:
+        print("Invalid option. Please enter 'Statement', 'Buy', or 'Sell'.")
 
 
 
