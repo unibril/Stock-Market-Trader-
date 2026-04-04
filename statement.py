@@ -1,23 +1,30 @@
 import mysql.connector 
-
-def view_statement():
+import pandas as pd
+def view_statement(user_id):
     conn = mysql.connector.connect(
         host="localhost",
         user = "root",
         password=""
     )
     cursor = conn.cursor()
-    cursor.execute("CREATE DATABASE IF NOT EXISTS USER_DETAILS")
-    cursor.execute("USE USER_DETAILS")
-    cursor.execute("SELECT balance FROM USER_DETAILS.")
-    results = cursor.fetchall()
-    print(f"Account balance: {results}")
-    cursor.execute("SELECT ticker, buy_price, quantity FROM financial_details")
-    results = cursor.fetchall()
-    ticker, buy_price, quantity = results
-    print("Your stock portfolio:")
-    for ticker, buy_price, quantity in results:
-        print(f"Ticker: {ticker}, Buy Price: {buy_price}, Quantity: {quantity}")
-    cursor.close()
-    conn.close()
+    try:
+        cursor.execute("USE USER_DETAILS")
+        cursor.execute("SELECT balance FROM users WHERE user_id = %s", (user_id,))
+        balance_result = cursor.fetchone()
+        print(f"Your account balance: {balance_result[0]}")
+        cursor.execute("SELECT ticker, buy_price, quantity FROM financial_details WHERE user_id = %s", (user_id,))
+        results = cursor.fetchall()
+        print("Your stock portfolio:")
+        df = pd.DataFrame(results, columns=["Ticker", "Buy Price", "Quantity"])
+        print(df.to_string(index=False))
+        confirmation = input("Do you want to view your transaction history? (yes/no) ")
+        if confirmation.lower() == "yes":
+            cursor.execute("SELECT ticker, buy_price, sell_price, quantity FROM transaction_history WHERE user_id = %s", (user_id,))
+            results = cursor.fetchall()
+            print("Your transaction history:")
+            df = pd.DataFrame(results, columns=["Ticker", "Buy Price", "Sell Price", "Quantity"])
+            print(df.to_string(index=False))
+    finally:
+        cursor.close()
+        conn.close()
     

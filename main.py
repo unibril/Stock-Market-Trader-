@@ -92,8 +92,7 @@ if logged_in:
         stock_id INT PRIMARY KEY AUTO_INCREMENT,
         user_id INT,
         ticker VARCHAR(10),
-        buy_price FLOAT,
-        sell_price FLOAT, 
+        buy_price FLOAT, 
         quantity INT, 
         FOREIGN KEY (user_id) REFERENCES users(user_id)
     )""")
