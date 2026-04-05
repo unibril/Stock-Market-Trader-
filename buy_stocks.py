@@ -10,7 +10,7 @@ def buy_stonks(current_user_id):
     cursor = conn.cursor()
     try:
         cursor.execute("USE USER_DETAILS")
-        stock = input("Enter the stock ticker you want to buy: ")
+        stock = input("Enter the stock ticker you want to buy: ").strip()
         stock_data = yf.Ticker(stock)
         try:
             current_price = round(stock_data.fast_info['last_price'], 2)
