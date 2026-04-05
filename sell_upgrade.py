@@ -109,7 +109,21 @@ def sell_stonks(user_id):
         conn.commit()
         print(f"\nSold {number_of_stocks} shares at {simulated_selling_price}")
         print(f"New balance: {round(balance, 2)}")
-
+        from profit_loss_calcu import profit_or_loss
+        sure = input("Do you want to see profit or loss? ")
+        if sure.lower() == "yes":
+            if batch_choice == len(batches):
+                sold_batches = []
+                remaining = number_of_stocks
+                for stock_id, buy_price, qty in batches:
+                    if remaining <= 0:
+                        break
+                    consumed = min(qty, remaining)
+                    sold_batches.append((buy_price, consumed))
+                    remaining -= consumed
+            else:
+                sold_batches = [(selected_buy_price, number_of_stocks)]
+            profit_or_loss(sold_batches, simulated_selling_price, stock, user_id)
     finally:
         cursor.close()
         conn.close()
