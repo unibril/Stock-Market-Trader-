@@ -113,22 +113,29 @@ if logged_in:
     conn.close()
 
     print("You are now logged in. You can view your statement, buy stocks, or sell stocks.")
-    initial = input("Enter 'Statement' to view your statement, 'Buy' to buy stocks, or 'Sell' to sell stocks or 'Add' to add funds: ")
-    if initial.lower() == "statement":
-        from statement import view_statement
-        view_statement(current_user_id)
-    elif initial.lower() == "buy":
-        from buy_stocks import buy_stonks
-        buy_stonks(current_user_id)
-    elif initial.lower() == "sell":
-        from sell_stocks import sell_stonks
-        sell_stonks(current_user_id)
-    elif initial.lower() == "add":
-        from statement import add_funds
-        amount = float(input("Enter the amount you want to add: "))
-        add_funds(current_user_id, amount)
-    else:
-        print("Invalid option. Please enter 'Statement', 'Buy', or 'Sell'.")
+    from statement import view_statement
+    from buy_stocks import buy_stonks
+    from statement import add_funds
+    from sell_upgrade import sell_stonks as sell_stonks_upgrade
+    while True:
+        initial = input("""Enter 'Statement' to view your statement, 'Buy' to buy stocks, or 'Sell' to sell stocks or
+                         'Add' to add funds or 'Exit' to exit: """)
+        if initial.lower() == "statement":
+            view_statement(current_user_id)
+        elif initial.lower() == "buy":
+            buy_stonks(current_user_id)
+        elif initial.lower() == "sell":
+            sell_stonks_upgrade(current_user_id)
+        elif initial.lower() == "add":
+            print("10000 has been added to your account for testing purposes.")
+            amount = 10000.0
+            add_funds(current_user_id, amount)
+        elif initial.lower().strip() == "exit":
+            print("Exiting the program. Goodbye!")
+            break
+        else:
+            print("Invalid option. Please enter 'Statement', 'Buy', or 'Sell'.")
+        
 
 
 
