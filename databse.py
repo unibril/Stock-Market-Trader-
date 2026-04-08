@@ -22,6 +22,7 @@ def init_db():
         ticker VARCHAR(10),
         buy_price FLOAT,
         quantity INT,
+        entry_date DATE,
         FOREIGN KEY (user_id) REFERENCES users(user_id)
     )""")
     cursor.execute("""CREATE TABLE IF NOT EXISTS transaction_history (
@@ -31,8 +32,13 @@ def init_db():
         buy_price FLOAT,
         sell_price FLOAT,
         quantity INT,
+        entry_date DATE,
+        exit_date DATE,
         FOREIGN KEY (user_id) REFERENCES users(user_id)
     )""")
+    cursor.execute("ALTER TABLE financial_details ADD COLUMN IF NOT EXISTS entry_date DATE")
+    cursor.execute("ALTER TABLE transaction_history ADD COLUMN IF NOT EXISTS entry_date DATE")
+    cursor.execute("ALTER TABLE transaction_history ADD COLUMN IF NOT EXISTS exit_date DATE")
     conn.commit()
     cursor.close()
     conn.close()
