@@ -33,8 +33,8 @@ def buy_stonks(current_user_id):
         if result:
             balance = result[0]
             if balance >= total_cost:
-                cursor.execute("INSERT INTO financial_details (user_id, ticker, buy_price, quantity) VALUES (%s, %s, %s, %s)", (current_user_id, stock, current_price, quantity))
-                cursor.execute("INSERT INTO transaction_history (user_id, ticker, buy_price, quantity) VALUES (%s, %s, %s, %s)", (current_user_id, stock, current_price, quantity))
+                cursor.execute("INSERT INTO financial_details (user_id, ticker, buy_price, quantity, entry_date) VALUES (%s, %s, %s, %s, CURDATE())", (current_user_id, stock, current_price, quantity))
+                cursor.execute("INSERT INTO transaction_history (user_id, ticker, buy_price, quantity, entry_date) VALUES (%s, %s, %s, %s, CURDATE())", (current_user_id, stock, current_price, quantity))
                 balance -= total_cost
                 cursor.execute("UPDATE users SET balance = %s WHERE user_id = %s", (balance, current_user_id))
                 conn.commit()
