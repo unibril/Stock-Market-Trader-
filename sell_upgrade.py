@@ -55,7 +55,7 @@ def sell_stonks(user_id):
             print("Invalid batch number.")
             return
 
-        # Sell from all batches (FIFO)
+        # FIFO ho yo loop bhitra ko 
         if batch_choice == len(batches):
             number_of_stocks = input(f"Enter number of stocks to sell (max {total_owned}): ")
             try:
@@ -73,18 +73,18 @@ def sell_stonks(user_id):
                     break
                 if remaining_to_sell >= qty:
                     cursor.execute("DELETE FROM financial_details WHERE stock_id = %s", (stock_id,))
-                    cursor.execute("INSERT INTO transaction_history (user_id, ticker, buy_price, sell_price, quantity) VALUES (%s, %s, %s, %s, %s)",
-                                   (user_id, stock, buy_price, simulated_selling_price, qty))
+                    cursor.execute("INSERT INTO transaction_history (user_id, ticker, buy_price, sell_price, quantity, exit_date) VALUES (%s, %s, %s, %s, %s, CURDATE())",
+                    (user_id, stock, buy_price, simulated_selling_price, qty))
                     remaining_to_sell -= qty
                 else:
                     sold_from_batch = remaining_to_sell
                     cursor.execute("UPDATE financial_details SET quantity = %s WHERE stock_id = %s",
                                    (qty - sold_from_batch, stock_id))
-                    cursor.execute("INSERT INTO transaction_history (user_id, ticker, buy_price, sell_price, quantity) VALUES (%s, %s, %s, %s, %s)",
-                                   (user_id, stock, buy_price, simulated_selling_price, sold_from_batch))
+                    cursor.execute("INSERT INTO transaction_history (user_id, ticker, buy_price, sell_price, quantity, exit_date) VALUES (%s, %s, %s, %s, %s, CURDATE())",
+                    (user_id, stock, buy_price, simulated_selling_price, sold_from_batch))
                     remaining_to_sell = 0
 
-        # Sell from specific batch
+        
         else:
             selected_id, selected_buy_price, selected_qty = batches[batch_choice]
             number_of_stocks = input(f"Enter number of stocks to sell (max {selected_qty}): ")
@@ -101,8 +101,9 @@ def sell_stonks(user_id):
             else:
                 cursor.execute("UPDATE financial_details SET quantity = %s WHERE stock_id = %s",
                                (selected_qty - number_of_stocks, selected_id))
-            cursor.execute("INSERT INTO transaction_history (user_id, ticker, buy_price, sell_price, quantity) VALUES (%s, %s, %s, %s, %s)",
-                           (user_id, stock, selected_buy_price, simulated_selling_price, number_of_stocks))
+            #indentation bigriyo ya aagi 
+            cursor.execute("INSERT INTO transaction_history (user_id, ticker, buy_price, sell_price, quantity, exit_date) VALUES (%s, %s, %s, %s, %s, CURDATE())",
+                (user_id, stock, selected_buy_price, simulated_selling_price, number_of_stocks))
 
         balance += simulated_selling_price * number_of_stocks
         cursor.execute("UPDATE users SET balance = %s WHERE user_id = %s", (balance, user_id))
