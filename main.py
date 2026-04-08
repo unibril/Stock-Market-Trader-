@@ -4,6 +4,7 @@ import buy_stocks
 import statement
 from auth import login, sign_up, reset_password
 from databse import init_db, get_connection 
+from compare import plot_performance
 init_db()
 
 print("Welcome to Unibril's Finance Tracker!")
@@ -52,13 +53,15 @@ if logged_in:
     from sell_upgrade import sell_stonks as sell_stonks_upgrade
     while True:
         initial = input("""Enter 'Statement' to view your statement, 'Buy' to buy stocks, or 'Sell' to sell stocks or
-                         'Add' to add funds or 'Exit' to exit: """)
+                         'Add' to add funds or 'chart' to view chart or 'Exit' to exit: """)
         if initial.lower() == "statement":
             view_statement(current_user_id)
         elif initial.lower() == "buy":
             buy_stonks(current_user_id)
         elif initial.lower() == "sell":
             sell_stonks_upgrade(current_user_id)
+        elif initial.lower().strip() == "chart":
+            plot_performance(current_user_id)
         elif initial.lower() == "add":
             print("10000 has been added to your account for testing purposes.")
             amount = 10000.0
