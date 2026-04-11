@@ -13,7 +13,7 @@ def get_connection():
     conn.cursor().execute("USE USER_DETAILS")
     return conn
 def init_db():
-    conn = mysql.connector.connect(host=os.getenv("DB_HOST"), user="DB_USER", password="DB_PASSWORD")
+    conn = mysql.connector.connect(host=os.getenv("DB_HOST"), user=os.getenv("DB_USER"), password=os.getenv("DB_PASSWORD"))
     cursor = conn.cursor()
     cursor.execute("CREATE DATABASE IF NOT EXISTS USER_DETAILS")
     cursor.execute("USE USER_DETAILS")
