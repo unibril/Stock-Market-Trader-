@@ -5,13 +5,14 @@ import statement
 from auth import login, sign_up, reset_password
 from databse import init_db, get_connection 
 from compare import plot_performance
+from bot_trader import run_bot
 init_db()
 
 print("Welcome to Unibril's Finance Tracker!")
 logged_in = False
 userid = None
 while not logged_in:
-    intial = input("Login or SignUp or Resetpassword ")
+    intial = input("Login or SignUp or Resetpassword ").lower().strip()
     if intial.lower() =="login":
         print("Enter your userid and password to log in.")
         while True: 
@@ -45,7 +46,7 @@ while not logged_in:
         print("Invalid option. Please enter 'Login' or 'SignUp'.")
 if logged_in:
     current_user_id = userid
- 
+    run_bot(userid)
     print("You are now logged in. You can view your statement, buy stocks, or sell stocks.")
     from statement import view_statement
     from buy_stocks import buy_stonks
